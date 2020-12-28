@@ -373,10 +373,17 @@ define(function (require) {
         this.dbgr.debug(cpu.pc);
     }
     Emulator.prototype.breakIn = function () {
-        if (!this.running) return;
-        this.running = false;
-        stop(true);
-        this.dbgr.debug(cpu.pc);
+        if (!this.running) {
+            $("#break").text('Break');
+            this.soundChip.unmute();
+            this.start();
+        } else {
+            $("#break").text('Run');
+            this.running = false;
+            this.soundChip.mute();
+            stop(true);
+            this.dbgr.debug(cpu.pc);
+        }
     };
     Emulator.prototype.stepIn = function () {
         var curpc = cpu.pc;
@@ -490,7 +497,7 @@ define(function (require) {
     Emulator.prototype.resizeScreen = function () {
         var canvasRatio = 696.0 / 900.0;
         var parentWidth = this.container.width;
-        var parentHeight = this.container.height;
+        var parentHeight = this.container.height - 40;
         var parentRatio = parentHeight / parentWidth;
         var width;
         var height;

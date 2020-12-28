@@ -1,4 +1,4 @@
-define(['jsunzip', 'promise'], function (jsunzip) {
+define(['promise'], function (jsunzip) {
     "use strict";
     var exports = {};
 

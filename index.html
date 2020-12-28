@@ -12,7 +12,11 @@
         <div class="editor"></div>
     </div>
     <div id="emulator">
-        <canvas class="screen" width="896" height="600"></canvas>
+        <canvas class="screen" width="896" height="600" style:'display: inline-block;'></canvas><br>
+        <button class="btn" id="build" onclick="buildAndBoot()"><i class="fa fa-home"></i> Build & Boot</button>
+        <button class="btn" id="break" onclick="emulator.breakIn()"><i class="fa fa-bars"></i> Break</button>
+        <button class="btn" onclick="emulator.stepIn()"><i class="fa fa-trash"></i> Step In</button>
+        <button class="btn" onclick="emulator.stepOver()"><i class="fa fa-close"></i> Step Over</button>
     </div>
     <div id="tree">
         <div class="tree"></div>

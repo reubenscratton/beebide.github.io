@@ -5,13 +5,11 @@ require.config({
         goldenlayout: 'vendor/golden-layout/dist/goldenlayout',
         events: 'vendor/eventEmitter/EventEmitter',
         clipboard: 'vendor/clipboard/dist/clipboard',
-        'raven-js': 'vendor/raven-js/dist/raven',
         promise: 'vendor/es6-promise/es6-promise',
         vs: 'vendor/monaco-editor/dev/vs',
         worker: 'vendor/requirejs-web-workers/src/worker',
         jstree: 'vendor/jstree/dist/jstree',
         jsbeeb: 'jsbeeb',
-        jsunzip: 'jsbeeb/lib/jsunzip',
         'webgl-debug': 'jsbeeb/lib/webgl-debug'
     },
     shim: {
@@ -24,15 +22,6 @@ var eventHub;
 var emulator;
 var project;
 var beebasm;
-
-function showTab(tabContentId) {
-    $('#tab_dis').toggleClass('active', tabContentId === 'dis');
-    $('#tab_mem').toggleClass('active', tabContentId === 'mem');
-    $('#tab_hw').toggleClass('active', tabContentId === 'hw');
-    $('#dis').toggle(tabContentId === 'dis');
-    $('#mem').toggle(tabContentId === 'mem');
-    $('#hw').toggle(tabContentId === 'hw');
-}
 
 function buildAndBoot() {
     //this.project.files.update('starquake/starquake.asm', this.editor.getValue());
@@ -127,9 +116,11 @@ define(function (require) {
             },
             {
             type: 'stack', 
-            hasHeaders: false, 
+            hasHeaders: true, 
             content: [
-                {type: 'component', componentName: 'debugger', componentState: {}}
+                {type: 'component', componentName: 'dbgDis', title: 'Disassembly', isClosable: false, componentState: {}},
+                {type: 'component', componentName: 'dbgMem', title: 'Memory', isClosable: false, componentState: {}},
+                {type: 'component', componentName: 'dbgHw', title: 'Hardware', isClosable: false, componentState: {}}
             ]
             },
         ],
@@ -164,8 +155,14 @@ define(function (require) {
     layout.registerComponent('console', function (container, state) {
         return new Console(container, state);
     });
-    layout.registerComponent('debugger', function( container, state ){
-        container.getElement().load('debug.html'); 
+    layout.registerComponent('dbgDis', function( container, state ){
+        container.getElement().load('dbg_dis.html'); 
+    });
+    layout.registerComponent('dbgMem', function( container, state ){
+        container.getElement().load('dbg_mem.html'); 
+    });
+    layout.registerComponent('dbgHw', function( container, state ){
+        container.getElement().load('dbg_hw.html'); 
     });
    
 

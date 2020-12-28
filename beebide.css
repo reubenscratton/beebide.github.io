@@ -1,0 +1,142 @@
+@import url("vendor/golden-layout/src/css/goldenlayout-base.css");
+@import url("vendor/golden-layout/src/css/goldenlayout-light-theme.css");
+@import url("vendor/jstree/dist/themes/default/style.css");
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.template {
+    display: none;
+}
+
+.console {
+    height: 100%;
+    width: 100%;
+}
+
+.editor {
+    height: 100%;
+    width: 100%;
+}
+.tree {
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+#navbar {
+    height: 30px;
+    background-color: #000;
+    overflow: hidden;
+}
+
+.navbar ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.navbar li {
+    float: left;
+    text-align: center;
+}
+
+.navbar li a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 5px 14px;
+}
+
+.navbar li a:hover {
+    background-color: #444;
+}
+
+.btn {
+  background-color: DodgerBlue;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+  }
+  
+  /* Style the buttons inside the tab */
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    transition: 0.3s;
+    font-size: 12px;
+  }
+  
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #ddd;
+  }
+  
+  /* Create an active/current tablink class */
+  .tab button.active {
+    background-color: #ccc;
+  }
+  
+  /* Style the tab content */
+  .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+  }
+ 
+.instr_bytes {
+    display: inline-block;
+    width: 6em;
+    color: #d0d0d0;
+}
+.mem_bytes {
+    display: inline-block;
+    width: 16em;
+    color: #a0a0a0;
+}
+.dis_addr {
+    display: inline-block;
+    width: 3em;
+    color: #66f;
+}
+.instr_mem_ref, .instr_instr_ref {
+    cursor: pointer;
+    color: #66f;
+}
+.current {
+    background-color: #c2f7f7;
+    font-weight: bold;
+}
+
+.highlight {
+    border: 1px solid #ddd;
+}
+
+.changed {
+    background-color: #f7a2a2;
+}
+h6.dbg { text-align: center }
+.via_regs {
+    display: inline-block;
+}

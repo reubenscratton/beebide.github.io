@@ -1,0 +1,37 @@
+{
+  "name": "raven-js",
+  "version": "3.27.2",
+  "dependencies": {},
+  "main": "dist/raven.js",
+  "ignore": [
+    "**/.*",
+    ".travis",
+    ".vscode",
+    ".github",
+    "AUTHORS",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "Gruntfile.js",
+    "Makefile",
+    "README.md",
+    "docs",
+    "packages",
+    "package.json",
+    "example",
+    "test",
+    "dist/sri.json",
+    "yarn.lock",
+    "tsconfig.json",
+    "lerna.json"
+  ],
+  "homepage": "https://github.com/getsentry/raven-js-bower",
+  "_release": "3.27.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "3.27.2",
+    "commit": "e544c43b5a02b4bada8b99dad63af6dfadf5fcbd"
+  },
+  "_source": "https://github.com/getsentry/raven-js-bower.git",
+  "_target": "^3.7.0",
+  "_originalSource": "raven-js"
+}

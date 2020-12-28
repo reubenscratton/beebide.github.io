@@ -1,0 +1,82 @@
+<html>
+<head>
+  <style>
+    #textbox_container {
+      background-color:antiquewhite;
+      height: 250px;
+      width: 800px;
+      overflow:auto;
+    }
+    #textbox {
+      height: 32768px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .line {
+      position: relative;
+    }
+  </style>
+<script>
+  var addr = 0x4000;
+  var textbox;
+  var lines = [];
+
+  function scrollUpdate () {
+    var scrollTop = textbox.parentElement.scrollTop;
+    for (var line of lines) {
+      if (line.offsetTop < scrollPos) {
+        line.style.top = lines[lines.length-1].offsetTop + 10 + "px";
+      }
+    }
+
+    /*if (clonesHeight + scrollPos >= scrollHeight) {
+      // Scroll to the top when you’ve reached the bottom
+      setScrollPos(1) // Scroll down 1 pixel to allow upwards scrolling
+      disableScroll = true
+    } else if (scrollPos <= 0) {
+      // Scroll to the bottom when you reach the top
+      setScrollPos(scrollHeight - clonesHeight)
+      disableScroll = true
+    }
+
+    if (disableScroll) {
+      // Disable scroll-jumping for a short time to avoid flickering
+      window.setTimeout(function () {
+        disableScroll = false
+      }, 40)
+    }*/
+  }
+
+  window.onload = function () {
+
+    textbox = document.getElementById('textbox');
+  
+
+    textbox.scrollTop = 0;
+
+    for (var i=0 ; i<100 ; i++) {
+      var newLine = document.createElement("div");
+      newLine.className = "line";
+      newLine.innerText = "" + i + "  : BLAHAHAHHA";
+      newLine.style.top  = "" + i*10 + "px";
+      textbox.appendChild(newLine);
+      lines.push(newLine);
+    }
+
+    textbox.parentElement.addEventListener('scroll', function () {
+      window.requestAnimationFrame(scrollUpdate)
+    }, false);
+  }
+
+</script>
+</head>
+
+<div id="textbox_container">
+  <div id="textbox">
+  </div>
+</div>
+
+<body>
+
+</body>
+
+</html>

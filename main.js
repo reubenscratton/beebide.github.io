@@ -18,13 +18,22 @@ require.config({
     }
 });
 
+var root;
+var layout;
 var eventHub;
 var emulator;
 var project;
 var beebasm;
 
 function buildAndBoot() {
-    //this.project.files.update('starquake/starquake.asm', this.editor.getValue());
+
+    // Autosave changes
+    var editorStack = layout.root.getItemsById('editorStack')[0];
+    for (let item of editorStack.contentItems) {
+        project.updateFile(item.config.componentState.file.id, item.instance.editor.getValue());
+    }
+
+    //this.project.files.update('starquake/starquake.asm', this.);
     beebasm(project);
             //console.log("compiled:", e);
 /*                this.hub.emit('compiled', e);
@@ -139,8 +148,8 @@ define(function (require) {
     };
 
 
-    var root = $("#root");
-    var layout = new GoldenLayout(config, root);
+    root = $("#root");
+    layout = new GoldenLayout(config, root);
     eventHub = layout.eventHub;
     layout.registerComponent('tree', function (container, state) {
         return new Tree(container, state);

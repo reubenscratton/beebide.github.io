@@ -28,16 +28,21 @@ function hexToBytes(hexString) {
 function registerFS(module, files, dir) {
     //dir += "/";
     for (var fileName in files) {
+        var fullPath = dir.length ? (dir + '/' + fileName) : fileName;
+        //var fullPath = dir + "/" + fileName;
+        //if (Module.FS.stat(fullPath)) {
+        //    Module.FS_unlink(fullPath);
+        //}
         var val = files[fileName];
         if (Object.prototype.toString.call(val) === '[object String]') {
             var isBinary = fileName.endsWith(".bmp") || fileName.endsWith(".bin");
             var rawVal = isBinary ? hexToBytes(val) : val;
-            Module.FS_createDataFile(dir, fileName, rawVal, true, false, true);
+            //Module.FS_createDataFile(dir, fileName, rawVal, true, false, true);
+            Module.FS.writeFile(fullPath, rawVal);
         }
         else {
             Module.FS_createPath(dir, fileName);
-            var newdir = dir.length ? (dir + '/' + fileName) : fileName;
-            registerFS(module, val, newdir);
+            registerFS(module, val, fullPath);
         }            
     }
 }

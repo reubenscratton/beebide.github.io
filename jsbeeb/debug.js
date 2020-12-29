@@ -41,7 +41,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
         enable(false);
         $('.initially-hidden').removeClass('initially-hidden');
 
-        var numToShow = 24;
+        var numToShow = 16;
         var i;
         for (i = 0; i < numToShow; i++) {
             disass.find('.template').clone().removeClass('template').appendTo(disass);
@@ -96,7 +96,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
             if (!video) return utils.noop;
             var updates = [];
 
-            var regNode = node.find('#crtc_regs');
+            var regNode = node.find('.crtc_regs');
 
             function makeRow(node, text) {
                 var row = node.find(".template").clone().removeClass("template").appendTo(node);
@@ -113,7 +113,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
                 })(i);
             }
 
-            var stateNode = node.find('#crtc_state');
+            var stateNode = node.find('.crtc_state');
             var others = [
                 'bitmapX', 'bitmapY', 'dispEnabled',
                 'horizCounter', 'inHSync', 'scanlineCounter', 'vertCounter', 'inVSync', 'inVertAdjust',
@@ -170,7 +170,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
             updateElem($("#cpu6502_x"), hexbyte(cpu.x));
             updateElem($("#cpu6502_y"), hexbyte(cpu.y));
             updateElem($("#cpu6502_s"), hexbyte(cpu.s));
-            $("#cpu6502_pc").text(hexword(cpu.pc));
+            updateElem($("#cpu6502_pc"), hexword(cpu.pc));
             ["c", "z", "i", "d", "v", "n"].forEach(function (flag) {
                 updateElem($("#cpu6502_flag_" + flag), cpu.p[flag] ? flag.toUpperCase() : flag);
             });
@@ -374,7 +374,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
                 elem.toggleClass('current', address === cpu.pc);
                 elem.toggleClass('highlight', address === disassPc);
                 elem.find('.instr_bytes').text(dump.hex.join(" "));
-                //elem.find('.instr_asc').text(dump.asc.join(""));
+                elem.find('.instr_asc').text(dump.asc.join(""));
                 var disNode = elem.find('.disassembly').html(result[0]);
                 disNode.find('.instr_mem_ref').click(memClick);
                 disNode.find('.instr_instr_ref').click(instrClick);
@@ -385,12 +385,12 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
 
             var i;
             var elem;
-            for (i = 0; i < numToShow - 3; ++i) {
-                elem = $(elems[i + 3]);
+            for (i = 0; i < numToShow / 2; ++i) {
+                elem = $(elems[i + numToShow / 2]);
                 address = updateDisElem(elem, address);
             }
             address = disassPc;
-            for (i = 2; i >= 0; --i) {
+            for (i = numToShow / 2 - 1; i >= 0; --i) {
                 address = prevInstruction(address);
                 elem = $(elems[i]);
                 updateDisElem(elem, address);

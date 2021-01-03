@@ -232,14 +232,14 @@ define(function (require) {
             }
         } else if (code === utils.keyCodes.HOME && evt.ctrlKey) {
             utils.noteEvent('keyboard', 'press', 'home');
-            stop(true);
+            this.stop();
         } else if (code === utils.keyCodes.INSERT && evt.ctrlKey) {
             utils.noteEvent('keyboard', 'press', 'insert');
             fastAsPossible = !fastAsPossible;
         } else if (code === utils.keyCodes.END && evt.ctrlKey) {
             utils.noteEvent('keyboard', 'press', 'end');
             pauseEmu = true;
-            stop(false);
+            this.stop();
         } else if (code === utils.keyCodes.B && evt.ctrlKey) {
             // Ctrl-B turns on the printer, so we open a printer output
             // window in addition to passing the keypress along to the beeb.
@@ -357,6 +357,7 @@ define(function (require) {
         }, this);
 
         this.hub.on('start', this.onStart, this);
+        this.hub.on('breakpointsChanged', this.onBreakpointsChanged, this);
 
         // Start!
         cpu.reset(true);
@@ -366,7 +367,8 @@ define(function (require) {
 
     Emulator.prototype.stepUntil = function(f) {
         cpu.targetCycles = cpu.currentCycles; // TODO: this prevents the cpu from running any residual cycles. look into a better solution
-        for (var i = 0; i < 65536; i++) {
+        //for (var i = 0; i < 65536; i++) {
+        while (true) {
             cpu.execute(1);
             if (f()) break;
         }
@@ -374,15 +376,9 @@ define(function (require) {
     }
     Emulator.prototype.breakIn = function () {
         if (!this.running) {
-            $("#break").text('Break');
-            this.soundChip.unmute();
             this.start();
         } else {
-            $("#break").text('Run');
-            this.running = false;
-            this.soundChip.mute();
-            stop(true);
-            this.dbgr.debug(cpu.pc);
+            this.stop();
         }
     };
     Emulator.prototype.stepIn = function () {
@@ -401,12 +397,34 @@ define(function (require) {
             this.stepIn();
         }
     };
+    Emulator.prototype.stepOut = function () {
+        this.dbgr.stepOut();
+    }
 
     Emulator.prototype.start = function () {
         if (this.running) return;
         this.running = true;
+        $("#break").text('Break');
+        $("#stepIn").prop('disabled', true);
+        $("#stepOver").prop('disabled', true);
+        $("#stepOut").prop('disabled', true);
         requestAnimationFrame(this.onAnimFrame);
+        this.soundChip.unmute();
+        this.ddNoise.unmute();
+        this.dbgr.hide();
     };
+    Emulator.prototype.stop = function () {
+        if (!this.running) return;
+        this.running = false;
+        $("#break").text('Resume');
+        $("#stepIn").prop('disabled', false);
+        $("#stepOver").prop('disabled', false);
+        $("#stepOut").prop('disabled', false);
+        cpu.stop();
+        this.soundChip.mute();
+        this.ddNoise.mute();
+        this.dbgr.debug(cpu.pc);
+}
 
     Emulator.prototype.onStart = function (e) {
         if (!this.ready) return;
@@ -476,11 +494,10 @@ define(function (require) {
             cycles = Math.min(cycles, MaxCyclesPerFrame);
             try {
                 if (!cpu.execute(cycles)) {
-                    this.running = false; // TODO: breakpoint
+                    this.stop();
                 }
             } catch (e) {
-                this.running = false;
-                this.dbgr.debug(cpu.pc);
+                this.stop();
                 throw e;
             }
         }
@@ -513,6 +530,15 @@ define(function (require) {
         this.canvas.gl.canvas.style.width = width + 'px';
         this.canvas.gl.canvas.style.height = height + 'px';
 
+    }
+
+    Emulator.prototype.onBreakpointsChanged = function() {
+        this.dbgr.clearBreakpoints();
+        for (var bp of breakpoints) {
+            if (bp.addr > 0) {
+                this.dbgr.toggleBreakpoint(bp.addr);
+            }
+        }
     }
 
     return Emulator;

@@ -19,8 +19,9 @@ define(function () {
             'CMP', 'CPX', 'CPY',
             'AND', 'ORA', 'EOR',
             'BPL', 'BMI', 'BEQ', 'BNE', 'BRA', 'BCC', 'BCS', 'BVS', 'BVC',
-            'JMP', 'BRK',
-            'ROL', 'ROR', 'ASL',
+            'JMP', 'BRK', 'JSR', 'RTS',
+            'ROL', 'ROR', 'ASL', 'LSR',
+            'PHA', 'PHP', 'PLA', 'PLP',
             'BIT'
         ],
         directives: [
@@ -29,8 +30,9 @@ define(function () {
             'SKIP',
             'SKIPTO',
             'ALIGN',
+            'COPYBLOCK',
             'INCLUDE',
-            'INCBIN',
+            'INCBIN', 'INCBMP',
             'EQUB',
             'EQUW',
             'EQUD',
@@ -59,8 +61,17 @@ define(function () {
             '{', '}', ':'
         ],
         symbols: /[-+#=><!*\/{}:]+/,
+        
+        // C# style strings
+        escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+
+        ignoreCase: true,
         tokenizer: {
             root: [
+                [/\#\$[0-9a-fA-F]+/, 'number.lit'],
+                [/\$[0-9a-fA-F]+/, 'number.addr'],
+                [/&[0-9a-fA-F]+/, 'number.addr'],
+
                 // identifiers and keywords
                 [/[a-zA-Z_$][\w$]*/, {
                     cases: {
@@ -79,11 +90,25 @@ define(function () {
                 [/@symbols/, { cases: {'@operators' : 'operator', '@default': ''}}],
                 // numbers
                 [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
-                [/&[0-9a-fA-F]+/, 'number.hex'],
                 [/\d+/, 'number'],
-                [/[{}()\[\]]/, '@brackets']
+                [/[{}()\[\]]/, '@brackets'],
+                // strings
+                [/"([^"\\]|\\.)*$/, 'string.invalid' ],  // non-teminated string
+                [/"/,  { token: 'string.quote', bracket: '@open', next: '@string' } ],
+
+                // characters
+                [/'[^\\']'/, 'string'],
+                [/(')(@escapes)(')/, ['string','string.escape','string']],
+                [/'/, 'string.invalid']
             ],
-            whitespace: [
+            string: [
+                [/[^\\"]+/,  'string'],
+                [/@escapes/, 'string.escape'],
+                [/\\./,      'string.escape.invalid'],
+                [/"/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ]
+              ],
+
+              whitespace: [
                 [/[ \t\r\n]+/, 'white'],
                 [/[;\\\\].*/, 'comment']
             ]

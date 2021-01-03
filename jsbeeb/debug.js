@@ -39,9 +39,8 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
         };
 
         enable(false);
-        $('.initially-hidden').removeClass('initially-hidden');
 
-        var numToShow = 16;
+        var numToShow = 24;
         var i;
         for (i = 0; i < numToShow; i++) {
             disass.find('.template').clone().removeClass('template').appendTo(disass);
@@ -151,6 +150,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
         var disassPc = null;
         var disassStack = [];
         this.debug = function (where) {
+            $('.initially-hidden').removeClass('initially-hidden');
             enable(true);
             updateDisassembly(where);
             updateRegisters();
@@ -163,6 +163,8 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
 
         this.hide = function () {
             enable(false);
+            if (cpu)
+                updateDisassembly(cpu.pc);
         };
 
         function updateRegisters() {
@@ -170,7 +172,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
             updateElem($("#cpu6502_x"), hexbyte(cpu.x));
             updateElem($("#cpu6502_y"), hexbyte(cpu.y));
             updateElem($("#cpu6502_s"), hexbyte(cpu.s));
-            updateElem($("#cpu6502_pc"), hexword(cpu.pc));
+            $("#cpu6502_pc").text(hexword(cpu.pc));
             ["c", "z", "i", "d", "v", "n"].forEach(function (flag) {
                 updateElem($("#cpu6502_flag_" + flag), cpu.p[flag] ? flag.toUpperCase() : flag);
             });
@@ -221,13 +223,14 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
             var s = cpu.s;
             stepUntil(function () {
                 if (cpu.s >= s && isReturn(cpu.pc)) {
-                    var nextInstr = nextInstruction(cpu.pc);
+                    //var nextInstr = nextInstruction(cpu.pc);
                     step();
-                    return cpu.pc !== nextInstr;
+                    return true; //cpu.pc !== nextInstr;
                 }
                 return false;
             });
         }
+        this.stepOut = stepOut;
 
         // Some attempt at making prevInstruction more accurate; score the sequence of instructions leading
         // up to the target by counting all "common" instructions as a point. The highest-scoring run of
@@ -342,23 +345,42 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
             updateMemory(info.ref);
         }
 
+        function clearBreakpoints() {
+            var elems = disass.children().filter(":visible");
+            for (var bp in breakpoints) {
+                breakpoints[bp].remove();
+                for (var elem of elems) {
+                    if (bp == $(elem).data().addr) {
+                        $(elem).find('.bp_gutter').removeClass('active');
+                    }
+                }
+            }
+            breakpoints = {};
+        }
+        this.clearBreakpoints = clearBreakpoints;
+
         function toggleBreakpoint(address) {
             if (breakpoints[address]) {
                 console.log("Removing breakpoint from address " + utils.hexword(address));
                 breakpoints[address].remove();
-                breakpoints[address] = undefined;
+                delete breakpoints[address];
             } else {
                 console.log("Adding breakpoint to address " + utils.hexword(address));
                 breakpoints[address] = cpu.debugInstruction.add(function (x) {
                     return x === address;
                 });
             }
+            var elems = disass.children().filter(":visible");
+            for (var elem of elems) {
+                $(elem).find('.bp_gutter').toggleClass('active', !!breakpoints[$(elem).data().addr]);
+            }
+
         }
+        this.toggleBreakpoint = toggleBreakpoint;
 
         function bpClick(e) {
             var address = $(e.target).closest('.dis_elem').data().addr;
-            toggleBreakpoint(address);
-            $(e.target).toggleClass('active', !!breakpoints[address]);
+            toggleBreakpointOnAddr(address);
         }
 
         disass.find('.bp_gutter').click(bpClick);
@@ -371,7 +393,7 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
                 var result = disassemble(address);
                 var dump = memdump(address, result[1]);
                 elem.find('.dis_addr').html(labelHtml(address));
-                elem.toggleClass('current', address === cpu.pc);
+                elem.toggleClass('current', (address === cpu.pc) && enabled);
                 elem.toggleClass('highlight', address === disassPc);
                 elem.find('.instr_bytes').text(dump.hex.join(" "));
                 elem.find('.instr_asc').text(dump.asc.join(""));
@@ -385,12 +407,12 @@ define(['jquery', 'underscore', './utils'], function ($, _, utils) {
 
             var i;
             var elem;
-            for (i = 0; i < numToShow / 2; ++i) {
-                elem = $(elems[i + numToShow / 2]);
+            for (i = 3; i < numToShow; ++i) {
+                elem = $(elems[i]);
                 address = updateDisElem(elem, address);
             }
             address = disassPc;
-            for (i = numToShow / 2 - 1; i >= 0; --i) {
+            for (i = 2; i >= 0; --i) {
                 address = prevInstruction(address);
                 elem = $(elems[i]);
                 updateDisElem(elem, address);

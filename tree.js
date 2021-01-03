@@ -52,7 +52,6 @@ define(function (require) {
             };
             parent.children.push(node);
             if (Object.prototype.toString.call(val) === '[object String]') {
-                node.data = val;
                 node.isPrimary = fileName == "starquake.asm"; // todo: make this a project property
                 if (fileName.endsWith(".bmp")) node.icon = "images/ic_bmp.png";
                 else if (fileName.endsWith(".bin")) node.icon = "images/ic_bin.png";
@@ -78,8 +77,9 @@ define(function (require) {
         this.tree.settings.core.data = root.children;
         this.tree.refresh();
 
-        this.container.layoutManager.eventHub.emit('fileSelected', primaryNode);
-
+        if (primaryNode !== undefined) {
+            this.container.layoutManager.eventHub.emit('fileSelected', primaryNode);
+        }
     };
 
     return Tree;
